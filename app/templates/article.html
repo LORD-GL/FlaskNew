@@ -1,16 +1,15 @@
 {% include 'header.html' %}
-
+<h2 class="articleTitle">{{ article.title }}</h5>
 <div class="card">
-    <img src="{{ url_for('static', filename='images/default_image.jpg') }}" class="card-img-top" alt="Image">
+    <img src="{{ url_for('static', filename=article.image) }}" class="card-img-top" alt="Image">
     <div class="card-body">
-        <h5 class="card-title">{{ article[1] }}</h5>
-        <p class="card-text">{{ article[2] }}</p>
-        <p class="card-text">{{ article[3] }}</p>
+        <p class="card-text">{{ article.description }}</p>
+        <p class="card-text">{{ article.content|safe }}</p>
     </div>
     <ul class="list-group list-group-flush">
-        <li class="list-group-item"><strong>Дата написания:</strong>{{ article[4].strftime("%Y-%m-%d") }}</li>
-        <li class="list-group-item"><strong>Автор:</strong>{{ article[6] }}</li>
-        <li class="list-group-item"><strong>Количество просмотров:</strong>{{ article[5] }}</li>
+        <li class="list-group-item"><strong>Дата написания: </strong>{{ article.creation_date.strftime("%Y-%m-%d") }}</li>
+        <li class="list-group-item"><strong>Автор: </strong>{{ article.author }}</li>
+        <li class="list-group-item"><strong>Количество просмотров: </strong>{{ article.views }}</li>
     </ul>
 </div>
 

@@ -9,10 +9,14 @@
     <li class="list-group-item">
     <div class="card">
     <div class="d-flex w-100 justify-content-between">
-        <img src="static/images/default_image.jpg" class="card-img-top" alt="Image 1" width="500" height="300">
+        <img src="static/{{ card.image }}" class="card-img-top" alt="Image 1" width="500" height="300">
         <div class="card-body">
-            <h5 class="card-title">{{ card[1] }}</h5>
-            <p class="card-text">{{ card[2] }}</p>
+            <a href="{{url_for('article', id=card.id)}}"><h5 class="card-title">{{ card.title }}</h5></a>
+            <p class="card-text">{{ card.description }}</p>
+            <div class="views">
+                <small>Просмотров: {{ card.views }}</small>
+                <img src="static/images/oko.png" alt="Image 2" width="25" height="20">
+            </div>
         </div>
     </div>
     </div>
