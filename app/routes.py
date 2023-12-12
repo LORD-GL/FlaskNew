@@ -72,11 +72,24 @@ def new_article():
 def edit_article(id):
     article = News.query.get_or_404(id)
     form = NewsForm(obj=article)
-
     if form.validate_on_submit():
         form.populate_obj(article)
-        ## СОХРАНЕНИЕ ИЗМЕНЕНИЙ 
-        return redirect(url_for("article", id = article.id))
+        article.title = form.title.data
+        article.description = form.description.data
+        article.content = form.content.data
+        article.author = form.author.data
+        try:
+            image_name = str(article.id) + "."
+            image_name += '.' in form.image.data.filename and form.image.data.filename.rsplit('.', 1)[1].lower()
+            form.image.data.save(os.path.join(app.config['UPLOAD_FOLDER'], image_name))
+            article.image = "images/"+image_name
+        except AttributeError:
+            pass
+        else:
+            render_template('edit_article.html', form=form, article=article, message="Error during saving the image")
+        finally:
+            db.session.commit()
+            return redirect(url_for("article", id = article.id))
     
     return render_template('edit_article.html', form=form, article=article)
 
