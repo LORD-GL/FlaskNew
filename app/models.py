@@ -1,15 +1,18 @@
+from email.policy import default
 from app import db
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.orm import relationship
 
-class UserDB(UserMixin, db.Model):
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
+    username = db.Column(db.String(50), unique=True, nullable=False, default="username")
+    email = db.Column(db.String(100), unique=True, nullable=False, default="default@gmail.com")
     registration_date = db.Column(db.DateTime, default=datetime.utcnow)
-    password_hash = db.Column(db.String(256), nullable=False) #128
+    password_hash = db.Column(db.String(256), nullable=False, default="HASH") 
+    articles = relationship('Article', back_populates='author_account')
 
     def set_password(self, password: str):
         self.password_hash = generate_password_hash(password)
@@ -23,7 +26,7 @@ class UserDB(UserMixin, db.Model):
 
 def add_user(username: str, email: str, password: str):
     try:
-        new_user = UserDB(username=username, email=email)
+        new_user = User(username=username, email=email)
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
@@ -34,23 +37,25 @@ def add_user(username: str, email: str, password: str):
     
 #################################################################
     
-class News(db.Model):
+class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(100), nullable=False, default="Title")
     image = db.Column(db.String(150), default="/static/images/default_image.jpg")
-    description = db.Column(db.String(500), nullable=False)
-    content = db.Column(db.Text, nullable=False)
+    description = db.Column(db.String(500), nullable=False, default="Description")
+    content = db.Column(db.Text, nullable=False, default="Content")
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
     views = db.Column(db.Integer, default=0)
-    author = db.Column(db.String(70), nullable=False)
-
+    author = db.Column(db.String(100), nullable=False, default="Author")
+    author_account_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    author_account = relationship('User', back_populates='articles')
+    
     def __repr__(self) -> str:
         return self.title
     
 
-def add_article(title: str, description: str, content: str, author: str):
+def add_article(title: str, description: str, content: str, author: str, author_account: User):
     try:
-        new_article = News(title=title, description=description, content=content, author=author)
+        new_article = Article(title=title, description=description, content=content, author=author, author_account=author_account)
         db.session.add(new_article)
         db.session.commit()
         return new_article

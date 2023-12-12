@@ -12,10 +12,10 @@
     <tbody>
         {% for user in users %}
             <tr>
-                <td>{{ user[0] }}</td>
-                <td>{{ user[1] }}</td>
-                <td>{{ user[2] }}</td>
-                <td>{{ user[3].strftime("%Y-%m-%d") }}</td>
+                <td>{{ user.id }}</td>
+                <td><a href="{{ url_for('user', username=user.username) }}">{{ user.username }}</a></td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.registration_date.strftime("%Y-%m-%d") }}</td>
             </tr>
         {% endfor %}
     </tbody>
