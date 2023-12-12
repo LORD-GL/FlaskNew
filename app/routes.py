@@ -4,22 +4,21 @@ from app import app, db, login_manager
 from app.models import UserDB, add_article, add_user, News
 from sqlalchemy import text
 from flask_login import login_user, current_user, login_required, logout_user
-# from PIL import Image
+from app.forms import NewsForm
 import os
 
-# Разрешенные расширения файлов
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-# Загрузчик пользователей
 @login_manager.user_loader
 def load_user(user_id):
     return UserDB.query.get(int(user_id))
 
-
+# from PIL import Image
 # def resize_image(input_name: str, output_name: str, new_size) -> bool:
 #     try:
 #         image = Image.open("static/images/"+input_name)
@@ -68,6 +67,20 @@ def new_article():
         return render_template('new_article.html', message="")
 
 
+@app.route('/edit/article/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_article(id):
+    article = News.query.get_or_404(id)
+    form = NewsForm(obj=article)
+
+    if form.validate_on_submit():
+        form.populate_obj(article)
+        ## СОХРАНЕНИЕ ИЗМЕНЕНИЙ 
+        return redirect(url_for("article", id = article.id))
+    
+    return render_template('edit_article.html', form=form, article=article)
+
+
 @app.route('/article/<int:id>')
 def article(id):
     article_i = News.query.get_or_404(int(id))
@@ -90,9 +103,8 @@ def singup():
 
 
 @app.route('/users')
-@login_required
 def usersGet():
-    if current_user.username == 'root':
+    if current_user.is_authenticated and current_user.username == 'root':
         sql_getall = text('SELECT * FROM user_db;')
         users = db.session.execute(sql_getall)
         if users:
@@ -100,7 +112,7 @@ def usersGet():
         else:
             return "There are any users"
     else:
-        return "You are not a root user!"
+        return "Access denied!"
     
 @app.route('/login', methods=['GET', 'POST'])
 def login():
