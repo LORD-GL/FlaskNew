@@ -10,7 +10,15 @@
         <li class="list-group-item"><strong>Дата написания: </strong>{{ article.creation_date.strftime("%Y-%m-%d") }}</li>
         <li class="list-group-item"><strong>Автор: </strong>{{ article.author }}</li>
         <li class="list-group-item"><strong>Количество просмотров: </strong>{{ article.views }}</li>
+        {% if article.themes %}
+            <li class="list-group-item">
+                {% for theme in article.themes %}
+                <strong> <a href="{{ url_for('theme', themelink=theme.link) }}">| {{ theme.name }} |</a> </strong>
+                {% endfor %}
+            </li>
+        {% endif %}
     </ul>
+    
 </div>
 
 {% if current_user.username == article.author_account.username %}

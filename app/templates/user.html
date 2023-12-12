@@ -14,7 +14,7 @@
             {% for article in user.articles %}
                 <li class="list-group-item"><a href="{{ url_for('article', id=article.id) }}">{{ article.title }}</a></li>
             {% endfor %}
-        </ul>
+        </ul>  
     {% else %}
     <ul class="list-group">
         <h4 class="list-group-item" style="text-align: center;"><br>There are no articles published by {{ user.username }}.<br><br></h4>

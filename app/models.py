@@ -6,7 +6,11 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import relationship
 
+###################################################################
+
 class User(UserMixin, db.Model):
+    __tablename__ = 'user'
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False, default="username")
     email = db.Column(db.String(100), unique=True, nullable=False, default="default@gmail.com")
@@ -35,9 +39,11 @@ def add_user(username: str, email: str, password: str):
         db.session.rollback()
         return False
     
-#################################################################
+###################################################################
     
 class Article(db.Model):
+    __tablename__ = 'article'
+
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False, default="Title")
     image = db.Column(db.String(150), default="/static/images/default_image.jpg")
@@ -48,7 +54,8 @@ class Article(db.Model):
     author = db.Column(db.String(100), nullable=False, default="Author")
     author_account_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     author_account = relationship('User', back_populates='articles')
-    
+    themes = relationship('Theme', secondary='article_theme_association', back_populates='articles')
+
     def __repr__(self) -> str:
         return self.title
     
@@ -62,3 +69,21 @@ def add_article(title: str, description: str, content: str, author: str, author_
     except IntegrityError:
         db.session.rollback()
         return False
+    
+    
+###################################################################
+    
+class Theme(db.Model):
+    __tablename__ = 'theme'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    link = db.Column(db.String(110), nullable=False)
+    articles = relationship('Article', secondary='article_theme_association', back_populates='themes')
+
+
+article_theme_association = db.Table(
+    'article_theme_association',
+    db.Column('article_id', db.Integer, db.ForeignKey('article.id')) ,
+    db.Column('theme_id', db.Integer, db.ForeignKey('theme.id'))
+)

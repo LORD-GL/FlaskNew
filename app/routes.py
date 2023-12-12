@@ -1,8 +1,9 @@
 import os
+from xml.dom import NotFoundErr
 from flask import render_template, request, url_for, redirect, flash, session
 import sqlalchemy
 from app import app, db, login_manager
-from app.models import User, add_article, add_user, Article
+from app.models import User, add_article, add_user, Article, Theme
 from sqlalchemy import text
 from flask_login import login_user, current_user, logout_user
 from app.forms import NewsForm
@@ -30,35 +31,39 @@ def login_required(f):
     return decorated_function
 
 
-# from PIL import Image
-# def resize_image(input_name: str, output_name: str, new_size) -> bool:
-#     try:
-#         image = Image.open("static/images/"+input_name)
-#         resized_image = image.resize(new_size)
-#         resized_image.save("static/images/"+output_name)
-#         return True
-#     except Exception:
-#         return False
-
+# @app.route('/test')
+# def test():
+#     article = Article.query.get(1)
+#     theme1 = Theme.query.get(1)
+#     theme2 = Theme.query.get(3)
+#     article.themes.append(theme1)
+#     article.themes.append(theme2)
+#     db.session.commit()
+#     return "Success"
 
 @app.route('/')
 def index():
-    if current_user.is_authenticated:
-        message = f"\nHello {current_user.username}"
-    else:
-        message = "Hello anonymous!"
-
     try: 
         sql_getall = text('SELECT * FROM article;')
         news = db.session.execute(sql_getall)
-        return render_template('index.html', pageName="Home Page", news = news, message = message)
+        return render_template('index.html', pageName="Home Page", news = news)
     except sqlalchemy.exc.ProgrammingError:
         return "Error"
+
+
+@app.route('/theme/<themelink>')
+def theme(themelink):
+    theme = Theme.query.filter_by(link = themelink).first()
+    if theme:
+        return render_template('theme.html', theme=theme, pageName=theme.name)
+    else:
+        return render_template('404.html', pageName="Not Found")
 
 
 @app.route('/new/article', methods=['GET', 'POST'])
 @login_required
 def new_article():
+    themes = Theme.query.all()
     if request.method == 'POST':
         image = request.files['file']
         if allowed_file(image.filename):
@@ -66,6 +71,11 @@ def new_article():
             if new_article is False:
                 return render_template('new_article.html', message="Something went wrong during creating new Article")
             else:
+                selected_themes_ids = request.form.getlist('themes')
+                for id in selected_themes_ids:
+                    selected_theme = Theme.query.filter_by(id=int(id)).first()
+                    new_article.themes.append(selected_theme)
+                ##########################################
                 image_name = str(new_article.id) + "."
                 image_name += '.' in image.filename and image.filename.rsplit('.', 1)[1].lower()
                 image.save(os.path.join(app.config['UPLOAD_FOLDER'], image_name))
@@ -74,9 +84,9 @@ def new_article():
                 # flash('Article successfully uploaded')
                 return redirect(url_for('article', id=new_article.id))
         else:
-            return render_template('new_article.html', message="Image format isn't supporting")
+            return render_template('new_article.html', message="Image format isn't supporting", themes=themes)
     else:
-        return render_template('new_article.html', message="")
+        return render_template('new_article.html', message="", themes=themes)
 
 
 @app.route('/delete/article/<int:id>')
@@ -112,11 +122,11 @@ def edit_article(id):
             except AttributeError:
                 pass
             else:
-                render_template('edit_article.html', form=form, article=article, message="Error during saving the image")
+                render_template('edit_article.html', form=form, article=article, message="Error during saving the image", pageName="Edit Article")
             finally:
                 db.session.commit()
                 return redirect(url_for("article", id = article.id))
-        return render_template('edit_article.html', form=form, article=article)
+        return render_template('edit_article.html', form=form, article=article, pageName="Edit Article")
     else:
         return render_template("access_denied.html")
 
@@ -129,8 +139,9 @@ def article(id):
         session[viewed_articles_key] = []
     if id not in session[viewed_articles_key]:
         article.views += 1
-        db.session.commit()
         session[viewed_articles_key].append(id)
+        db.session.commit()
+        session.modified = True
     return render_template("article.html", article = article, pageName="Article")
 
 
