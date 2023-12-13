@@ -22,7 +22,7 @@
             <textarea class="ckeditor" name="content" id="content" row="8"></textarea><br>
         </div>
         <div class="form-group">
-            <label for="themes">Выберите темы:</label>
+            <label for="themes">Choose themes:</label>
             <select class="form-control" name="themes" id="themes" multiple>
                 {% for theme in themes %}
                     <option value="{{ theme.id }}">{{ theme.name }}</option>

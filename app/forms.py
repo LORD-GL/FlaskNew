@@ -3,6 +3,9 @@ from wtforms import StringField
 from wtforms.validators import DataRequired
 from flask_ckeditor import CKEditorField
 from flask_wtf.file import FileField, FileAllowed
+from wtforms_sqlalchemy.fields import QuerySelectMultipleField
+
+from app.models import Theme
 
 
 class NewsForm(FlaskForm):
@@ -11,3 +14,5 @@ class NewsForm(FlaskForm):
     description = StringField('Description', validators=[DataRequired()])
     content = CKEditorField('Content', validators=[DataRequired()])
     author = StringField('Author', validators=[DataRequired()])
+    themes = QuerySelectMultipleField('Themes', query_factory=lambda: Theme.query.all(), get_label="name")
+

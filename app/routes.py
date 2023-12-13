@@ -1,5 +1,4 @@
 import os
-from xml.dom import NotFoundErr
 from flask import render_template, request, url_for, redirect, flash, session
 import sqlalchemy
 from app import app, db, login_manager
@@ -22,6 +21,12 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+@app.context_processor
+def inject_themes():
+    themes = Theme.query.all()
+    return dict(themes=themes)
+
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -30,16 +35,6 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-
-# @app.route('/test')
-# def test():
-#     article = Article.query.get(1)
-#     theme1 = Theme.query.get(1)
-#     theme2 = Theme.query.get(3)
-#     article.themes.append(theme1)
-#     article.themes.append(theme2)
-#     db.session.commit()
-#     return "Success"
 
 @app.route('/')
 def index():
@@ -86,7 +81,7 @@ def new_article():
         else:
             return render_template('new_article.html', message="Image format isn't supporting", themes=themes)
     else:
-        return render_template('new_article.html', message="", themes=themes)
+        return render_template('new_article.html', message="", themes=themes, pageName="New Article")
 
 
 @app.route('/delete/article/<int:id>')
@@ -106,6 +101,7 @@ def delete_article(id):
 @login_required
 def edit_article(id):
     article = Article.query.get_or_404(id)
+    themes = Theme.query.all()
     if current_user.username == "root" or current_user.id == article.author_account.id:
         form = NewsForm(obj=article)
         if form.validate_on_submit():
@@ -114,6 +110,10 @@ def edit_article(id):
             article.description = form.description.data
             article.content = form.content.data
             article.author = form.author.data
+            selected_themes = form.themes.data
+            article.themes = []
+            for selected_theme in selected_themes:
+                article.themes.append(selected_theme)
             try:
                 image_name = str(article.id) + "."
                 image_name += '.' in form.image.data.filename and form.image.data.filename.rsplit('.', 1)[1].lower()
@@ -122,13 +122,13 @@ def edit_article(id):
             except AttributeError:
                 pass
             else:
-                render_template('edit_article.html', form=form, article=article, message="Error during saving the image", pageName="Edit Article")
+                render_template('edit_article.html', form=form, article=article, themes=themes, message="Error during saving the image", pageName="Edit Article")
             finally:
                 db.session.commit()
                 return redirect(url_for("article", id = article.id))
-        return render_template('edit_article.html', form=form, article=article, pageName="Edit Article")
+        return render_template('edit_article.html', form=form, article=article, themes=themes, pageName="Edit Article")
     else:
-        return render_template("access_denied.html")
+        return render_template("access_denied.html", pageName="Error")
 
 
 @app.route('/article/<int:id>')

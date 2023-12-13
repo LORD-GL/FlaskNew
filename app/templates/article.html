@@ -18,8 +18,8 @@
             </li>
         {% endif %}
     </ul>
-    
 </div>
+<em style="margin-left: 85%;">Published by <a href="{{ url_for('user', username=article.author_account.username) }}">{{ article.author_account.username }}</a></em>
 
 {% if current_user.username == article.author_account.username %}
 <div class="container mt-5">

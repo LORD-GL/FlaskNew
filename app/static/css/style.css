@@ -31,3 +31,14 @@
     margin-left: 10px;
 }
 
+#sidebar {
+    margin-top: 65px; 
+    margin-left: 14px;
+}
+
+#main {
+    margin-left: 18% !important;
+    width: 70% !important;
+}
+
+

@@ -29,6 +29,14 @@
                 <label for="author">Author:</label>
                 {{ form.author(class="form-control") }}<br>
             </div>
+            <div class="form-group">
+                <label for="themes">Choose themes:</label>
+                <select class="form-control" name="themes" id="themes" multiple>
+                    {% for theme in themes %}
+                        <option value="{{ theme.id }}" {% if theme in article.themes %} selected {% endif %}>{{ theme.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
             <p class="text-danger">{{ message }}</p>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -43,4 +51,20 @@
                 console.error(error);
             });
     </script>
+    <script>
+        $(document).ready(function(){
+            $('#themes').on('mousedown', 'option', function(e) {
+                e.preventDefault();
+                var originalScrollTop = $(this).parent().scrollTop();
+    
+                $(this).prop('selected', !$(this).prop('selected'));
+    
+                var $select = $(this).parent().focus();
+                var selected = $select.val();
+                $select.val(selected);
+                $select.scrollTop(originalScrollTop);
+            });
+        });
+    </script>
+</div>
 {% include 'footer.html' %}

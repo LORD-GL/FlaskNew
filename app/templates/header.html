@@ -33,4 +33,27 @@
         </div>
     </nav>
     </header>
-<div class="container mt-5">
+    <!-- Sidebar --><!-- Sidebar --><!-- Sidebar --><!-- Sidebar -->
+    <div class="container-fluid">
+    <div class="row">
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar fixed-top">
+            <h5 style="color:lightblue">themes:</h5>
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    {% for theme in themes %}
+                        <li class="nav-item">
+                            <a href=" {{url_for('theme', themelink=theme.link)}} ">{{ theme.name }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% if current_user.username %}
+                <small><a href="{{ url_for('user', username=current_user.username) }}">{{current_user.username}}</a></small>
+            {% endif %}
+        </nav>
+    </div>
+    </div>
+    <!-- Sidebar --><!-- Sidebar --><!-- Sidebar --><!-- Sidebar -->
+    <!-- Content --><!-- Content --><!-- Content --><!-- Content -->
+
+    <main id="main" role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
