@@ -1,9 +1,9 @@
 {% include "header.html" %}
 
-<h2 class="text-center mb-4">{{ theme.name }}</h2>
-{% if theme.articles %}
+<h2 class="text-center mb-4">{{ pageName }}</h2>
+{% if articles %}
     <ul class="list-group">
-    {% for article in theme.articles %}
+    {% for article in articles %}
         <li class="list-group-item">
         <div class="card">
         <div class="d-flex w-100 justify-content-between">
@@ -24,6 +24,32 @@
 {% else%}
     <ul class="list-group">
         <h4 class="list-group-item" style="text-align: center;"><br>There are no articles by this theme yet.<br><br></h4>
+    </ul>
+{% endif %}
+
+{% if news_amount > ARTICLES_PER_PAGE %}
+    <ul class="pagination justify-content-center">
+        {% if news_page > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('theme', themelink=theme.link, page=news_page-1) }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        {% endif %}
+
+        {% for page_num in range(1, (news_amount // ARTICLES_PER_PAGE) + 1) %}
+            <li class="page-item {% if news_page == page_num %}active{% endif %}">
+                <a class="page-link" href="{{ url_for('theme', themelink=theme.link, page=page_num) }}">{% if news_page == page_num %}◉{% else %}{{ page_num }}{% endif %}</a>
+            </li>
+        {% endfor %}
+        
+        {% if news_page < (news_amount // ARTICLES_PER_PAGE) %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('theme', themelink=theme.link, page=news_page+1) }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        {% endif %}
     </ul>
 {% endif %}
 {% include "footer.html" %}

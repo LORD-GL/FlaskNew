@@ -7,9 +7,10 @@ from sqlalchemy import text
 from flask_login import login_user, current_user, logout_user
 from app.forms import NewsForm
 from functools import wraps
+from sqlalchemy.exc import ProgrammingError
 import os
 
-
+ARTICLES_PER_PAGE = 2
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
@@ -22,9 +23,9 @@ def load_user(user_id):
 
 
 @app.context_processor
-def inject_themes():
+def inject_global_variables():
     themes = Theme.query.all()
-    return dict(themes=themes)
+    return dict(themes=themes, ARTICLES_PER_PAGE=ARTICLES_PER_PAGE)
 
 
 def login_required(f):
@@ -39,18 +40,32 @@ def login_required(f):
 @app.route('/')
 def index():
     try: 
-        sql_getall = text('SELECT * FROM article;')
-        news = db.session.execute(sql_getall)
-        return render_template('index.html', pageName="Home Page", news = news)
-    except sqlalchemy.exc.ProgrammingError:
+        page = request.args.get('page', 1, type=int)
+        per_page = ARTICLES_PER_PAGE
+        start = (page - 1) * per_page
+        end = start + per_page
+        news = Article.query.all()[start:end]
+        news_amount = len(Article.query.all())
+        if news_amount % 2 != 0:
+            news_amount += 1
+        return render_template('index.html', pageName="Home Page", news = news, news_page=page, news_amount=news_amount)
+    except ProgrammingError:
         return "Error"
 
 
 @app.route('/theme/<themelink>')
 def theme(themelink):
+    page = request.args.get('page', 1, type=int)
+    per_page = ARTICLES_PER_PAGE
+    start = (page - 1) * per_page
+    end = start + per_page
     theme = Theme.query.filter_by(link = themelink).first()
+    articles = theme.articles[start:end]
+    news_amount = len(theme.articles)
+    if news_amount % 2 != 0:
+        news_amount += 1
     if theme:
-        return render_template('theme.html', theme=theme, pageName=theme.name)
+        return render_template('theme.html', articles=articles, pageName=theme.name, news_page=page, theme=theme, news_amount=news_amount)
     else:
         return render_template('404.html', pageName="Not Found")
 

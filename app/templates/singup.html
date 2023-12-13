@@ -4,6 +4,7 @@
     <h2 class="text-center mb-4">Sing Up Form</h2>
 
     <form method="post" action="/singup">
+        <p class="text-danger">{{ message }}</p><br>
         <div class="form-group">
             <label for="username">Username:</label>
             <input type="text" class="form-control" name="username" required/> <br><br>
@@ -24,7 +25,6 @@
             <input type="email" class="form-control" name="email" required/> <br><br>
         </div>
 
-        <p class="text-danger">{{ message }}</p>
         <div class="form-group">
             <button type="submit" class="btn btn-primary">Sing Up</button>
         </div>
