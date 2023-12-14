@@ -8,9 +8,10 @@ from flask_login import login_user, current_user, logout_user
 from app.forms import NewsForm
 from functools import wraps
 from sqlalchemy.exc import ProgrammingError
+from sqlalchemy import desc
 import os
 
-ARTICLES_PER_PAGE = 2
+ARTICLES_PER_PAGE = 5
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
@@ -28,11 +29,21 @@ def inject_global_variables():
     return dict(themes=themes, ARTICLES_PER_PAGE=ARTICLES_PER_PAGE)
 
 
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.is_authenticated:
+            if current_user.username == 'root':
+                return f(*args, **kwargs)
+        return render_template("access_denied.html")
+    return decorated_function
+
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
-            return render_template("access_denied.html")
+            return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
 
@@ -44,7 +55,7 @@ def index():
         per_page = ARTICLES_PER_PAGE
         start = (page - 1) * per_page
         end = start + per_page
-        news = Article.query.all()[start:end]
+        news = Article.query.order_by(desc(Article.creation_date)).all()[start:end]
         news_amount = len(Article.query.all())
         if news_amount % 2 != 0:
             news_amount += 1
@@ -182,16 +193,14 @@ def singup():
 
 
 @app.route('/users')
+@admin_required
 def usersGet():
-    if current_user.is_authenticated and current_user.username == 'root':
-        try:
-            sql_getall = text('SELECT * FROM user;')
-            users = db.session.execute(sql_getall)
-            return render_template('users.html', pageName="Users List", users=users)
-        except sqlalchemy.exc.ProgrammingError:
-            return "There are any users"
-    else:
-        return render_template("access_denied.html")
+    try:
+        sql_getall = text('SELECT * FROM user;')
+        users = db.session.execute(sql_getall)
+        return render_template('users.html', pageName="Users List", users=users)
+    except sqlalchemy.exc.ProgrammingError:
+        return "There are any users"
     
 @app.route('/login', methods=['GET', 'POST'])
 def login():

@@ -24,11 +24,20 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="list-item active"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
-                <li class="list-item"><a class="nav-link" href="{{ url_for('singup') }}">Sing Up</a></li>
-                <li class="list-item"><a class="nav-link" href="{{ url_for('usersGet') }}">Users List</a></li>
-                <li class="list-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
-                <li class="list-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+                <li class="list-item nav-link">|</li>
+                {% if not current_user.is_authenticated %}
+                    <li class="list-item"><a class="nav-link" href="{{ url_for('singup') }}">Sing Up</a></li>
+                    <li class="list-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+                {% else %}
+                    <li class="list-item"><a href="{{ url_for('user', username=current_user.username) }}" class="nav-link">{{current_user.username}}</a></li>
+                {% endif %}
+                <li class="list-item nav-link">|</li>
                 <li class="list-item"><a class="nav-link" href="{{ url_for('new_article') }}">New Article</a></li>
+                
+                {% if current_user.username == 'root' %}
+                    <li class="list-item nav-link">|</li>
+                    <li class="list-item"><a class="nav-link" href="{{ url_for('usersGet') }}">Users List</a></li>
+                {% endif %}
             </ul>
         </div>
     </nav>
@@ -47,9 +56,6 @@
                     {% endfor %}
                 </ul>
             </div>
-            {% if current_user.username %}
-                <small><a href="{{ url_for('user', username=current_user.username) }}">{{current_user.username}}</a></small>
-            {% endif %}
         </nav>
     </div>
     </div>

@@ -2,7 +2,7 @@
 <h2 class="articleTitle">User Profile</h2>
 <div class="card">
     <div class="card-body">
-        <h5 class="card-title">Username: {{ user.username }}</h5><br>
+        <h5 class="card-title">Username: {{ user.username }} {% if current_user.username == user.username %} <a style="margin-left: 30px;" href="{{ url_for('logout') }}">Logout</a>{% endif %}</h5><br>
         <p class="card-text">Email: {{ user.email }}</p>
         <p class="card-text">Registration Date: {{ user.registration_date.strftime("%Y-%m-%d") }}</p>
     </div>
