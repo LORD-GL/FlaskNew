@@ -157,7 +157,7 @@ def edit_article(id):
         return render_template("access_denied.html", pageName="Error")
 
 
-@app.route('/article/<int:id>')
+@app.route('/article/<int:id>', methods=['POST', 'GET'])
 def article(id):
     article = Article.query.get_or_404(int(id))
     viewed_articles_key = 'viewed_articles'
@@ -168,6 +168,25 @@ def article(id):
         session[viewed_articles_key].append(id)
         db.session.commit()
         session.modified = True
+
+################################################################
+    if request.method == 'POST':
+        selected_reaction = request.form.get('reaction')
+        print(selected_reaction)
+        if selected_reaction in article.reactions:
+            if current_user.username not in article.reactions[selected_reaction]:
+                # Если текущего пользователя нет в списке отреагировавших, добавляем его
+                article.reactions[selected_reaction].append(current_user.username)
+            else:
+                # Если текущий пользователь уже отреагировал, удаляем старую реакцию и добавляем новую
+                article.reactions[selected_reaction].remove(current_user.username)
+                article.reactions[selected_reaction].append(current_user.username)
+        else:
+            # Если реакция отсутствует, создаем новую запись
+            article.reactions[selected_reaction] = [current_user.username]
+        db.session.commit()
+#######################################################################
+
     return render_template("article.html", article = article, pageName="Article")
 
 

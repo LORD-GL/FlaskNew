@@ -43,7 +43,7 @@ def add_user(username: str, email: str, password: str):
     
 class Article(db.Model):
     __tablename__ = 'article'
-
+    
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False, default="Title")
     image = db.Column(db.String(150), default="/static/images/default_image.jpg")
@@ -51,6 +51,9 @@ class Article(db.Model):
     content = db.Column(db.Text, nullable=False, default="Content")
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
     views = db.Column(db.Integer, default=0)
+    reactions = db.Column(db.JSON, default={
+        'likes' : [], 'cry' : [], 'funny' : []
+    })
     author = db.Column(db.String(100), nullable=False, default="Author")
     author_account_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     author_account = relationship('User', back_populates='articles')
