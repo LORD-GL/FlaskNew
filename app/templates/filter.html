@@ -1,0 +1,16 @@
+<div class="container mt-5" id="FilterBox">
+    <form method="get" action="{{ url_for_link }}" class="form-inline">
+        <label for="filter" class="form-control mr-3">Filter:</label>
+        <select id="filter" name="filter">
+            <option value="new" {% if filter_type == 'new' %} selected {% endif %}>New first</option>
+            <option value="old" {% if filter_type == 'old' %} selected {% endif %}>Old first</option>
+            <option value="popular" {% if filter_type == 'popular' %} selected {% endif %}>Popular first</option>
+            <option value="unpopular" {% if filter_type == 'unpopular' %} selected {% endif %}>Unpopular first</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Apply filter</button>
+    </form>
+</div>
+
+
+<!-- col-md-6 -->
+<!-- row -->

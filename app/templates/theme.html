@@ -1,6 +1,9 @@
 {% include "header.html" %}
 
 <h2 class="text-center mb-4">{{ pageName }}</h2>
+
+{% block filter %}{% include 'filter.html' %}{% endblock %}
+
 {% if articles %}
     <ul class="list-group">
     {% for article in articles %}

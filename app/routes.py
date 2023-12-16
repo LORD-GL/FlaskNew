@@ -48,6 +48,17 @@ def login_required(f):
     return decorated_function
 
 
+def get_filtered_articles(filter_by, articles_list):
+    if filter_by == 'new':
+        return sorted(articles_list, key=lambda article: article.creation_date, reverse=True)
+    elif filter_by == 'old':
+        return sorted(articles_list, key=lambda article: article.creation_date)
+    elif filter_by == 'unpopular':
+        return sorted(articles_list, key=lambda article: article.views)
+    elif filter_by == 'popular':
+        return sorted(articles_list, key=lambda article: article.views, reverse=True)
+
+
 @app.route('/')
 def index():
     try: 
@@ -55,11 +66,18 @@ def index():
         per_page = ARTICLES_PER_PAGE
         start = (page - 1) * per_page
         end = start + per_page
-        news = Article.query.order_by(desc(Article.creation_date)).all()[start:end]
-        news_amount = len(Article.query.all())
+        all_news = Article.query.all()
+        if 'filter' in request.args.keys():
+            filter_type = request.args['filter']
+            news = get_filtered_articles(filter_type, all_news)[start:end]
+        else:
+            filter_type = 'new'
+            news = Article.query.order_by(desc(Article.creation_date)).all()[start:end]
+        news_amount = len(all_news)
         if news_amount % 2 != 0:
             news_amount += 1
-        return render_template('index.html', pageName="Home Page", news = news, news_page=page, news_amount=news_amount)
+        return render_template('index.html', pageName="Home Page", url_for_link=url_for('index'),
+                               news = news, news_page=page, news_amount=news_amount, filter_type=filter_type)
     except ProgrammingError:
         return "Error"
 
@@ -71,12 +89,18 @@ def theme(themelink):
     start = (page - 1) * per_page
     end = start + per_page
     theme = Theme.query.filter_by(link = themelink).first()
-    articles = theme.articles[start:end]
+    if 'filter' in request.args.keys():
+            filter_type = request.args['filter']
+            articles = get_filtered_articles(filter_type, theme.articles)[start:end]
+    else:
+        filter_type = 'new'
+        articles = theme.articles[start:end]
     news_amount = len(theme.articles)
     if news_amount % 2 != 0:
         news_amount += 1
     if theme:
-        return render_template('theme.html', articles=articles, pageName=theme.name, news_page=page, theme=theme, news_amount=news_amount)
+        return render_template('theme.html', articles=articles, url_for_link=url_for('theme', themelink=theme.link),
+                               pageName=theme.name, news_page=page, theme=theme, news_amount=news_amount)
     else:
         return render_template('404.html', pageName="Not Found")
 
@@ -157,7 +181,7 @@ def edit_article(id):
         return render_template("access_denied.html", pageName="Error")
 
 
-@app.route('/article/<int:id>', methods=['POST', 'GET'])
+@app.route('/article/<int:id>')#, methods=['POST', 'GET'])
 def article(id):
     article = Article.query.get_or_404(int(id))
     viewed_articles_key = 'viewed_articles'
@@ -169,22 +193,22 @@ def article(id):
         db.session.commit()
         session.modified = True
 
-################################################################
-    if request.method == 'POST':
-        selected_reaction = request.form.get('reaction')
-        print(selected_reaction)
-        if selected_reaction in article.reactions:
-            if current_user.username not in article.reactions[selected_reaction]:
-                # Если текущего пользователя нет в списке отреагировавших, добавляем его
-                article.reactions[selected_reaction].append(current_user.username)
-            else:
-                # Если текущий пользователь уже отреагировал, удаляем старую реакцию и добавляем новую
-                article.reactions[selected_reaction].remove(current_user.username)
-                article.reactions[selected_reaction].append(current_user.username)
-        else:
-            # Если реакция отсутствует, создаем новую запись
-            article.reactions[selected_reaction] = [current_user.username]
-        db.session.commit()
+#######################################################################REACTIONS
+    # if request.method == 'POST':
+        # selected_reaction = request.form.get('reaction')
+        # print(selected_reaction)
+        # if selected_reaction in article.reactions:
+        #     if current_user.username not in article.reactions[selected_reaction]:
+        #         # Если текущего пользователя нет в списке отреагировавших, добавляем его
+        #         article.reactions[selected_reaction].append(current_user.username)
+        #     else:
+        #         # Если текущий пользователь уже отреагировал, удаляем старую реакцию и добавляем новую
+        #         article.reactions[selected_reaction].remove(current_user.username)
+        #         article.reactions[selected_reaction].append(current_user.username)
+        # else:
+        #     # Если реакция отсутствует, создаем новую запись
+        #     article.reactions[selected_reaction] = [current_user.username]
+        # db.session.commit()
 #######################################################################
 
     return render_template("article.html", article = article, pageName="Article")

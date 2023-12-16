@@ -1,4 +1,3 @@
-from email.policy import default
 from app import db
 from datetime import datetime
 from sqlalchemy.exc import IntegrityError
@@ -51,9 +50,9 @@ class Article(db.Model):
     content = db.Column(db.Text, nullable=False, default="Content")
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
     views = db.Column(db.Integer, default=0)
-    reactions = db.Column(db.JSON, default={
-        'likes' : [], 'cry' : [], 'funny' : []
-    })
+    # reactions = db.Column(db.JSON, default={
+    #     'likes' : [], 'cry' : [], 'funny' : []
+    # })
     author = db.Column(db.String(100), nullable=False, default="Author")
     author_account_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     author_account = relationship('User', back_populates='articles')
@@ -90,3 +89,5 @@ article_theme_association = db.Table(
     db.Column('article_id', db.Integer, db.ForeignKey('article.id')) ,
     db.Column('theme_id', db.Integer, db.ForeignKey('theme.id'))
 )
+
+####################################################################
