@@ -100,7 +100,7 @@ def theme(themelink):
         news_amount += 1
     if theme:
         return render_template('theme.html', articles=articles, url_for_link=url_for('theme', themelink=theme.link),
-                               pageName=theme.name, news_page=page, theme=theme, news_amount=news_amount)
+                               pageName=theme.name, news_page=page, theme=theme, news_amount=news_amount, filter_type=filter_type)
     else:
         return render_template('404.html', pageName="Not Found")
 
