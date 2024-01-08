@@ -1,11 +1,11 @@
 import os
 from flask import render_template, request, url_for, redirect, flash, session
 import sqlalchemy
-from app import app, db, login_manager
-from app.models import User, add_article, add_user, Article, Theme
+from app_old import app, db, login_manager
+from app_old.models import User, add_article, add_user, Article, Theme
 from sqlalchemy import text
 from flask_login import login_user, current_user, logout_user
-from app.forms import NewsForm
+from app_old.forms import NewsForm
 from functools import wraps
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy import desc
