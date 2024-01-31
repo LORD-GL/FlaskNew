@@ -1,0 +1,24 @@
+{% include 'header.html' %}
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th> Reg. Date </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td><a href="{{ url_for('user.user', username=user.username) }}">{{ user.username }}</a></td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.registration_date.strftime("%Y-%m-%d") }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% include 'footer.html' %}

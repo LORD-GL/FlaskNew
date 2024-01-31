@@ -26,4 +26,13 @@ def create_app():
     app.register_blueprint(user_bp)
     app.register_blueprint(articles_bp)
 
+    app.secret_key = "super_secret_key_ever!"
+
     return app
+
+app = create_app()
+
+@login_manager.user_loader
+def load_user(user_id):
+    from app.models import User
+    return User.query.get(int(user_id))

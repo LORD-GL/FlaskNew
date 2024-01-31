@@ -1,0 +1,24 @@
+{% include "header.html" %}
+<h2 class="articleTitle">User Profile</h2>
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Username: {{ user.username }} {% if current_user.username == user.username %} <a style="margin-left: 30px;" href="{{ url_for('user.logout') }}">Logout</a>{% endif %}</h5><br>
+        <p class="card-text">Email: {{ user.email }}</p>
+        <p class="card-text">Registration Date: {{ user.registration_date.strftime("%Y-%m-%d") }}</p>
+    </div>
+</div>
+<div class="mt-5">
+<h3 style="margin-bottom: 15px;">Publications:</h3><br>
+    {% if user.articles %}
+        <ul class="list-group">
+            {% for article in user.articles %}
+                <li class="list-group-item"><a href="{{ url_for('articles.article', id=article.id) }}">{{ article.title }}</a></li>
+            {% endfor %}
+        </ul>  
+    {% else %}
+    <ul class="list-group">
+        <h4 class="list-group-item" style="text-align: center;"><br>There are no articles published by {{ user.username }}.<br><br></h4>
+    </ul>
+    {% endif %}
+</div>
+{% include "footer.html" %}
