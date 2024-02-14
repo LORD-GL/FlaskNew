@@ -3,10 +3,9 @@ from flask import render_template, request, url_for, redirect
 from app.decorators import login_required
 from .funcs import allowed_file
 from flask_login import current_user
-from app.db_utils.article_utils import add_article
-from app.forms.forms import NewsForm
-import os 
-
+from app.db_utils import add_article
+from app.forms import NewsForm
+import os
 articles_bp = Blueprint('articles', __name__)
 
 

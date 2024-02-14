@@ -1,5 +1,5 @@
 from flask import Blueprint
-from app.db_utils.user_utils import add_user
+from app.db_utils import add_user
 from app.decorators import admin_required, login_required
 from flask_login import login_user, logout_user
 from sqlalchemy import text
