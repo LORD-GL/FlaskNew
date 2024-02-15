@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  flask:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    ports:
+      - "5890:5890"
+    environment:
+      MYSQL_DATABASE: projectflask
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"

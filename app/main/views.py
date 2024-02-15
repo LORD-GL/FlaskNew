@@ -39,7 +39,6 @@ def index():
                                news = news, news_page=page, news_amount=news_amount, filter_type=filter_type)
     except ProgrammingError:
         return "Error"
-    
 
 
 @main_bp.route('/theme/<themelink>')
