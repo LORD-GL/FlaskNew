@@ -6,11 +6,15 @@ from flask_login import current_user
 from app.db_utils import add_article
 from app.forms import NewsForm
 import os
+
+
+# BLUEPRINT CREATING
 articles_bp = Blueprint('articles', __name__)
 
 
 @articles_bp.context_processor
 def inject_global_variables():
+    """ sets global variables"""
     from app.models import Theme
     from app.cca import CCA
     themes = Theme.query.all()

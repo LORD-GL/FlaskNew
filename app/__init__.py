@@ -1,3 +1,8 @@
+"""
+Initialisation file for the project
+here I define all main variable such a
+db - database, migrate - migration manager and ect.
+"""
 from flask import Flask
 from config import config
 from .main.views import main_bp
@@ -12,6 +17,7 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 ckeditor = CKEditor()
 migrate = Migrate()
+
 
 def create_app():
     app = Flask(__name__)
@@ -30,9 +36,11 @@ def create_app():
 
     return app
 
+
 app = create_app()
 
 @login_manager.user_loader
 def load_user(user_id):
+    """ This function sets up model that used as User model"""
     from app.models import User
     return User.query.get(int(user_id))
