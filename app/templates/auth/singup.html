@@ -1,32 +1,45 @@
 {% include 'header.html' %}
 <div class="row justify-content-center">
 <div class="col-md-6">
-    <h2 class="text-center mb-4">Sing Up Form</h2>
+    <h2 class="text-center mb-4">Sing Up Form</h2><br>
 
     <form method="post" action="/singup">
-        <p class="text-danger">{{ message }}</p><br>
+        {{ form.hidden_tag() }}
         <div class="form-group">
-            <label for="username">Username:</label>
-            <input type="text" class="form-control" name="username" required/> <br><br>
+            {{ form.username.label }}
+            {{ form.username(class="form-control") }}
+            {% for error in form.username.errors %}
+            {% endfor %}
         </div>
 
         <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" class="form-control" name="password" required/> <br><br>
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control") }}
+            {% for error in form.password.errors %}
+                <p class="text-danger">{{ error }}</p>
+            {% endfor %}
         </div>
 
         <div class="form-group">
-            <label for="confirm_password">Confirm Password:</label>
-            <input type="password" class="form-control" name="confirm_password" required/> <br><br>
+            {{ form.confirm_password.label(class="form-label") }}
+            {{ form.confirm_password(class="form-control") }}
+            {% for error in form.confirm_password.errors %}
+                <p class="text-danger">{{ error }}</p>
+            {% endfor %}
         </div>
 
         <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" class="form-control" name="email" required/> <br><br>
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control") }}
+            {% for error in form.email.errors %}
+                <p class="text-danger">{{ error }}</p>
+            {% endfor %}
         </div>
 
+
+        <p class="text-danger">{{ message }}</p>
         <div class="form-group">
-            <button type="submit" class="btn btn-primary">Sing Up</button>
+            {{ form.submit(class="btn btn-primary") }}
         </div>
     </form>
 </div>

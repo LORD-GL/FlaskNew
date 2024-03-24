@@ -1,1 +1,1 @@
-from .forms import NewsForm
+from .forms import NewsForm, LoginForm, SingUpForm
