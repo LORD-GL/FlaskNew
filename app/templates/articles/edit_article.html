@@ -7,39 +7,60 @@
         <form method="post" action="{{ url_for('articles.edit_article', id = article.id) }}" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
             <div class="form-group">
-                <label for="title">Title:</label>
-                {{ form.title(class="form-control") }}<br>
+                {{ form.title.label  }}
+                {{ form.title(class="form-control") }}
+                {% for error in form.title.errors %}
+                    <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+                <br>
             </div>
             <div class="form-group">
                 <label>Old Image:</label>
                 <img src="{{ url_for('static', filename=article.image) }}" alt="Current Image" width="500" height="300">
                 <br><br>
-                <label for="image">New Image:</label>
-                {{ form.image(class="form-control") }}<br>
+                {{ form.image.label }}
+                {{ form.image(class="form-control") }}
+                {% for error in form.image.errors %}
+                    <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+                <br>
             </div>
             <div class="form-group">
-                <label for="description">Description:</label>
-                {{ form.description(class="form-control") }}<br>
+                {{ form.description.label }}
+                {{ form.description(class="form-control") }}
+                {% for error in form.description.errors %}
+                    <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+                <br>
             </div>
             <div class="form-group">
-                <label for="content">Text:</label>
-                {{ form.content(class="form-control") }}<br>
+                {{ form.content.label }}
+                {{ form.content(class="form-control") }}
+                {% for error in form.content.errors %}
+                    <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+                <br>
             </div>
             <div class="form-group">
-                <label for="author">Author:</label>
-                {{ form.author(class="form-control") }}<br>
+                {{ form.author.label }}
+                {{ form.author(class="form-control") }}
+                {% for error in form.author.errors %}
+                    <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+                <br>
             </div>
             <div class="form-group">
-                <label for="themes">Choose themes:</label>
+                {{ form.themes.label }}
                 <select class="form-control" name="themes" id="themes" multiple>
                     {% for theme in themes %}
                         <option value="{{ theme.id }}" {% if theme in article.themes %} selected {% endif %}>{{ theme.name }}</option>
                     {% endfor %}
                 </select>
+                <br>
             </div>
             <p class="text-danger">{{ message }}</p>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
+                {{ form.submit(class="btn btn-primary") }}
             </div>
         </form>
     </div>

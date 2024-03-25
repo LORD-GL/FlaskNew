@@ -34,6 +34,7 @@ class NewsForm(FlaskForm):
     content = CKEditorField('Content', validators=[DataRequired()])
     author = StringField('Author', validators=[DataRequired()])
     themes = QuerySelectMultipleField('Themes', query_factory=lambda:get_themes(), get_label="name")
+    submit = SubmitField('Save')
 
 
 class LoginForm(FlaskForm):

@@ -26,30 +26,30 @@ def inject_global_variables():
 def new_article():
     from app.models import Theme
     from app import db, app
-    themes = Theme.query.all()
-    if request.method == 'POST':
-        image = request.files['file']
-        if allowed_file(image.filename):
-            new_article = add_article(request.form['title'], request.form['description'], request.form['content'], request.form['author'], current_user)
-            if new_article is False:
-                return render_template('articles/new_article.html', message="Something went wrong during creating new Article")
-            else:
-                selected_themes_ids = request.form.getlist('themes')
-                for id in selected_themes_ids:
-                    selected_theme = Theme.query.filter_by(id=int(id)).first()
-                    new_article.themes.append(selected_theme)
-                ##########################################
-                image_name = str(new_article.id) + "."
-                image_name += '.' in image.filename and image.filename.rsplit('.', 1)[1].lower()
-                image.save(os.path.join(app.config['UPLOAD_FOLDER'], image_name))
-                new_article.image = "images/"+image_name
-                db.session.commit()
-                # flash('Article successfully uploaded')
-                return redirect(url_for('articles.article', id=new_article.id))
+    # themes = Theme.query.all()
+    form = NewsForm()
+    if form.validate_on_submit():  # allowed_file(image.filename):
+        print("VALIDATION PASSED")
+        new_article = add_article(form.title.data, form.description.data, form.description.data, form.author.data, current_user)
+        if new_article is False:
+            return render_template('articles/new_article.html', form=form, message="Something went wrong during creating new Article")
         else:
-            return render_template('articles/new_article.html', message="Image format isn't supporting", themes=themes)
+            selected_themes_ids = request.form.getlist('themes')
+            for i in selected_themes_ids:
+                selected_theme = Theme.query.filter_by(id=int(i)).first()
+                new_article.themes.append(selected_theme)
+            ##########################################
+            image = form.image.data
+            image_name = str(new_article.id) + "."
+            image_name += '.' in image.filename and image.filename.rsplit('.', 1)[1].lower()
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], image_name))
+            new_article.image = "images/"+image_name
+            db.session.commit()
+            # flash('Article successfully uploaded')
+            return redirect(url_for('articles.article', id=new_article.id))
     else:
-        return render_template('articles/new_article.html', message="", themes=themes, pageName="New Article")
+        print("NEW ARTICLE ROUTE")
+        return render_template('articles/new_article.html', form=form, message='')
 
 
 @articles_bp.route('/delete/article/<int:id>')
